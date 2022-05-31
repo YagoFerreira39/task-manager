@@ -1,8 +1,32 @@
 const User = require('../models/user');
-const Task = require('../models/task')
-const asyncWrapper = require('../middlewares/asyncWrapper')
+const Task = require('../models/task');
+const asyncWrapper = require('../middlewares/asyncWrapper');
+const bcrypt = require('bcryptjs');
 
 const UserController = {
+  // Login
+  loginUser: asyncWrapper(async (req, res) => {
+    const { email, password } = req.body;
+
+    function unableToLogin() {
+      return res.status(400).json({ message: 'Email or password incorrect.', success: false });
+    }
+
+    const user = await User.findOne({ email: req.body.email });
+
+    if(!user) {
+      return unableToLogin()
+    }
+  
+    const isMatch = await bcrypt.compare(password, user.password);
+  
+    if(!isMatch) {  
+      return unableToLogin()
+    }
+
+    return res.status(200).json({ user, token: '#', success: true });
+  }),
+
   getAll: asyncWrapper(async (req, res) => {
     const users = await User.find({})
 
