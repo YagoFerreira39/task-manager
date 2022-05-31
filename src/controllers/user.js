@@ -13,6 +13,7 @@ const UserController = {
     }
 
     const user = await User.findOne({ email: req.body.email });
+    const token = await user.generateAuthToken()
 
     if(!user) {
       return unableToLogin()
@@ -24,7 +25,7 @@ const UserController = {
       return unableToLogin()
     }
 
-    return res.status(200).json({ user, token: '#', success: true });
+    return res.status(200).json({ user, token, success: true });
   }),
 
   getAll: asyncWrapper(async (req, res) => {
