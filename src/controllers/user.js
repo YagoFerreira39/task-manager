@@ -35,14 +35,13 @@ const UserController = {
   }),
 
   getUser: asyncWrapper(async (req, res) => {
-    const user = await User.findOne({ _id: req.params.id});
-    const user_tasks = await Task.find({ owner: user._id });
+    const user_tasks = await Task.find({ owner: req.user._id });
 
     if(user_tasks.length > 0) {
-      user.tasks = user_tasks;
+      req.user.tasks = user_tasks;
     }
 
-    res.status(200).json({ user })
+    res.status(200).json({ user: req.user })
   }),
 
   createUser: asyncWrapper(async (req, res) => {    
