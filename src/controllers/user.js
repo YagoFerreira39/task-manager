@@ -21,7 +21,7 @@ const UserController = {
   
     const isMatch = await bcrypt.compare(password, user.password);
   
-    if(!isMatch) {  
+    if(!isMatch) {
       return unableToLogin()
     }
 
@@ -47,7 +47,8 @@ const UserController = {
 
   createUser: asyncWrapper(async (req, res) => {    
     const user = await User.create(req.body);
-    res.status(201).json({ user })
+    const token = await user.generateAuthToken();
+    res.status(201).json({ user, token })
   }),
 
   updateUser: asyncWrapper(async (req, res) => {
