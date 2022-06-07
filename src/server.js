@@ -2,11 +2,15 @@ const express = require('express');
 const connectDB = require('./mongodb/connect')
 const users = require('./routes/users')
 const tasks = require('./routes/tasks')
-const notFound = require('./middlewares/not-found')
+const notFound = require('./middlewares/not-found');
+const maintenanceMode = require('./middlewares/maintenance');
 require('dotenv').config()
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+/* Maintenance middleware */
+//app.use(maintenanceMode)
 
 app.use(express.json());
 
