@@ -32,7 +32,7 @@ const TaskController = {
 
     // Check fields to update
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['title', 'description', 'completed']
+    const allowedUpdates = ['title', 'description', 'completed', 'status']
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
 
     if(!isValidOperation) {

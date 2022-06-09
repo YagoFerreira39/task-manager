@@ -94,6 +94,7 @@ const UserController = {
     if(!user.status) {
       user.tokens = [];
       await user.save();
+      await Task.updateMany({ owner: user._id }, { status: false });
       return res.status(200).json({ message: 'User is no longer active. All Sessions are logged out.', success: true })
     }
 
