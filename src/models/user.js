@@ -43,12 +43,7 @@ const User = new Schema(
           throw new Error('Age must be a positive number')
         }
       }
-    },  
-    tasks: [{    
-      type: Schema.Types.ObjectId,
-      ref: 'Task',
-      default: []
-    }], 
+    }, 
     tokens: [{
       token: {
         type: String,

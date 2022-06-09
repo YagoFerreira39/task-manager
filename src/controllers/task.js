@@ -17,10 +17,6 @@ const TaskController = {
 
       const task = await Task.create({ ...req.body, owner: owner });
 
-      const user_tasks = req.user.tasks;
-      user_tasks.push(task)
-      const user = await User.findByIdAndUpdate({_id: req.user._id }, { tasks: user_tasks })
-
       res.status(201).json({ task })
     } catch (error) {
       res.status(500).json({ error })
