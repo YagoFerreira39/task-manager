@@ -11,6 +11,10 @@ const authMiddleware = async (req, res, next) => {
       throw new Error()
     }
 
+    if(user.status === false) {
+      return res.status(400).send({ message: 'User may not have access.' })
+    }
+
     req.user = user;
     req.token = token;
 

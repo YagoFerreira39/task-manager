@@ -9,13 +9,16 @@ const UserController = {
     const { email, password } = req.body;
 
     function unableToLogin() {
+      if(user.status === false) {
+        return res.status(400).send({ message: 'User may not have access.', success: false })
+      }
       return res.status(400).json({ message: 'Email or password incorrect.', success: false });
     }
 
     const user = await User.findOne({ email: req.body.email });
     const token = await user.generateAuthToken()
 
-    if(!user) {
+    if(!user || !user.status) {
       return unableToLogin()
     }
   
@@ -64,13 +67,7 @@ const UserController = {
   getUser: asyncWrapper(async (req, res) => {
     const user_tasks = await Task.find({ owner: req.user._id });
 
-    console.log("TOKEN: ", req.token)
-
-    if(user_tasks.length > 0) {
-      req.user.tasks = user_tasks;
-    }
-
-    res.status(200).json({ user: req.user.getPublicProfile() })
+    res.status(200).json({ user: req.user.getPublicProfile(), tasks: user_tasks })
   }),
 
   createUser: asyncWrapper(async (req, res) => {    
@@ -81,7 +78,7 @@ const UserController = {
 
   updateUser: asyncWrapper(async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'email', 'password', 'age']
+    const allowedUpdates = ['name', 'email', 'password', 'age', 'status']
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
 
     if(!isValidOperation) {
@@ -93,6 +90,12 @@ const UserController = {
     updates.map(update => user[update] = req.body[update])
 
     await user.save();
+
+    if(!user.status) {
+      user.tokens = [];
+      await user.save();
+      return res.status(200).json({ message: 'User is no longer active. All Sessions are logged out.', success: true })
+    }
 
 
     /*const updatedUser = await User.findOneAndUpdate({ _id: userId }, req.body, {

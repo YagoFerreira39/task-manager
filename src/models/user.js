@@ -44,6 +44,10 @@ const User = new Schema(
         }
       }
     }, 
+    status: {
+      type: Boolean,
+      default: true
+    },
     tokens: [{
       token: {
         type: String,
@@ -53,6 +57,12 @@ const User = new Schema(
   },
   { timestamps: true }
 );
+
+User.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'owner'
+})
 
 /* User Model Methods */
 User.methods.generateAuthToken = async function () {

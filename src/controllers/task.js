@@ -11,17 +11,20 @@ const TaskController = {
     res.status(200).json({ tasks })
   }),
 
-  createTask: async (req, res) => {
-    try {
+  getTask: asyncWrapper(async (req, res) => {
+    const _id = req.params.id
+    const task = await Task.findOne({ _id, owner: req.user._id })
+
+    return res.status(200).json({ task, success: true })
+  }),
+
+  createTask: asyncWrapper(async (req, res) => {
       const owner = req.user._id;
 
       const task = await Task.create({ ...req.body, owner: owner });
 
       res.status(201).json({ task })
-    } catch (error) {
-      res.status(500).json({ error })
-    }
-  }
+  })
 }
 
 module.exports = TaskController;
