@@ -70,7 +70,7 @@ const UserController = {
       req.user.tasks = user_tasks;
     }
 
-    res.status(200).json({ user: req.user })
+    res.status(200).json({ user: req.user.getPublicProfile() })
   }),
 
   createUser: asyncWrapper(async (req, res) => {    
@@ -80,10 +80,15 @@ const UserController = {
   }),
 
   updateUser: asyncWrapper(async (req, res) => {
-    const { id: userId } = req.params
     const updates = Object.keys(req.body)
+    const allowedUpdates = ['name', 'email', 'password', 'age']
+    const isValidOperation = updates.every(update => allowedUpdates.includes(update));
 
-    const user = await User.findById(userId)
+    if(!isValidOperation) {
+      return res.status(400).json({ message: 'Invalid update!' })
+    }
+
+    const user = req.user;
 
     updates.map(update => user[update] = req.body[update])
 
@@ -95,11 +100,7 @@ const UserController = {
       runValidators: true
     });*/
 
-    if(!user) {
-      return res.status(500).json({ message: 'User not found' });
-    }
-
-    res.status(200).json({ user });
+    res.status(200).json({ user: user.getPublicProfile() });
   })
 }
 
