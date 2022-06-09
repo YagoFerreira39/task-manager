@@ -24,6 +24,35 @@ const TaskController = {
       const task = await Task.create({ ...req.body, owner: owner });
 
       res.status(201).json({ task })
+  }),
+
+  updateTask: asyncWrapper(async (req, res) => {    
+    const _id = req.params.id
+    const task = await Task.findOne({ _id, owner: req.user._id })
+
+    // Check fields to update
+    const updates = Object.keys(req.body);
+    const allowedUpdates = ['title', 'description', 'completed']
+    const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+
+    if(!isValidOperation) {
+      return res.status(400).json({ message: 'Invalid update!' })
+    }
+
+    // Update task
+    updates.map(update => task[update] = req.body[update])
+
+    await task.save();
+
+    return res.status(200).json({ task, success: true })
+  }),
+
+  // Remove task
+  removeTask: asyncWrapper(async (req, res) => {
+    const _id = req.params.id
+    const task = await Task.deleteOne({ _id, owner: req.user._id })
+    
+    return res.status(200).json({ success: true, task })
   })
 }
 
