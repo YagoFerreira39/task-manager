@@ -4,6 +4,6 @@ const authMiddleware = require('../middlewares/authMiddleware')
 
 const Task = require('../controllers/task');
 
-router.route('/').get(Task.getAll).post(authMiddleware, Task.createTask);
+router.route('/').get(authMiddleware, Task.getAll).post(authMiddleware, Task.createTask);
 
 module.exports = router;

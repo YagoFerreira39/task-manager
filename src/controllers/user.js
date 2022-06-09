@@ -28,6 +28,28 @@ const UserController = {
     return res.status(200).json({ user, token, success: true });
   }),
 
+  logoutUser: asyncWrapper(async (req, res) => {
+    req.user.tokens = req.user.tokens.filter(token => {
+      return token.token !== req.token
+    })
+
+    await req.user.save();
+
+    const hasOtherSessionsOpen = req.user.tokens.length > 0;
+
+    res.status(200).send({ message: 'User logged out', success: true, hasOtherSessionsOpen })
+  }),
+
+  LogoutAllSessions: asyncWrapper(async (req, res) => {
+    req.user.tokens = [];
+
+    await req.user.save();
+
+    const hasOtherSessionsOpen = req.user.tokens.length > 0;
+
+    res.status(200).json({ user: req.user, message: 'User is done with all sessions', success: true, hasOtherSessionsOpen })
+  }),
+
   getAll: asyncWrapper(async (req, res) => {
     const users = await User.find({})
 
@@ -36,6 +58,8 @@ const UserController = {
 
   getUser: asyncWrapper(async (req, res) => {
     const user_tasks = await Task.find({ owner: req.user._id });
+
+    console.log("TOKEN: ", req.token)
 
     if(user_tasks.length > 0) {
       req.user.tasks = user_tasks;

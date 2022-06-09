@@ -1,14 +1,15 @@
 const Task = require('../models/task');
 const User = require('../models/user');
+const asyncWrapper = require('../middlewares/asyncWrapper');
 
 const mongoose = require('mongoose');
 
 const TaskController = {
-  getAll: async (req, res) => {
-    const tasks = await Task.find({})
+  getAll: asyncWrapper(async (req, res) => {
+    const tasks = await Task.find({ owner: req.user._id })
 
     res.status(200).json({ tasks })
-  },
+  }),
 
   createTask: async (req, res) => {
     try {
