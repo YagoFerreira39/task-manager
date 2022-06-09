@@ -25,9 +25,10 @@ const UserController = {
       return unableToLogin()
     }
 
-    return res.status(200).json({ user, token, success: true });
+    return res.status(200).json({ user: user.getPublicProfile(), token, success: true });
   }),
 
+  // Logout user
   logoutUser: asyncWrapper(async (req, res) => {
     req.user.tokens = req.user.tokens.filter(token => {
       return token.token !== req.token
@@ -40,6 +41,7 @@ const UserController = {
     res.status(200).send({ message: 'User logged out', success: true, hasOtherSessionsOpen })
   }),
 
+  // Logout every user session
   LogoutAllSessions: asyncWrapper(async (req, res) => {
     req.user.tokens = [];
 
@@ -47,13 +49,16 @@ const UserController = {
 
     const hasOtherSessionsOpen = req.user.tokens.length > 0;
 
-    res.status(200).json({ user: req.user, message: 'User is done with all sessions', success: true, hasOtherSessionsOpen })
+    res.status(200).json({ message: 'User is done with all sessions', success: true, hasOtherSessionsOpen })
   }),
 
   getAll: asyncWrapper(async (req, res) => {
     const users = await User.find({})
+    
+    let publicProfiles = []
+    users.map(user => publicProfiles.push(user.getPublicProfile()))
 
-    res.status(200).json({ users })
+    res.status(200).json({ publicProfiles })
   }),
 
   getUser: asyncWrapper(async (req, res) => {

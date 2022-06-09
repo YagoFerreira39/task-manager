@@ -59,7 +59,8 @@ const User = new Schema(
   { timestamps: true }
 );
 
-User.methods.generateAuthToken = async function() {
+/* User Model Methods */
+User.methods.generateAuthToken = async function () {
   const user = this;
   const token = jwt.sign({ _id: user._id.toString() }, process.env.AUTH_TOKEN_SECRET);
 
@@ -67,6 +68,16 @@ User.methods.generateAuthToken = async function() {
   await user.save();
   
   return token
+}
+
+User.methods.getPublicProfile = function () {
+  const user = this;
+  const userObject = user.toObject();
+
+  delete userObject.password;
+  delete userObject.tokens;
+
+  return userObject;
 }
 
 // Before User is created/updated
